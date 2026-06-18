@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load security_filters %}
+{% block title %}Counselor Dashboard | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-0">Counselor Dashboard</h1>
+    <div class="text-muted small">Track and manage active cases.</div>
+  </div>
+  <div>
+    <a class="btn btn-outline-primary" href="{% url 'reports:cases' %}">Open Cases</a>
+  </div>
+</div>
+
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="text-muted small">Pending</div>
+        <div class="fs-3 fw-semibold">{{ pending_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="text-muted small">Ongoing</div>
+        <div class="fs-3 fw-semibold">{{ ongoing_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="text-muted small">Resolved</div>
+        <div class="fs-3 fw-semibold">{{ resolved_count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h2 class="h6 mb-0">Pending Reports</h2>
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'reports:cases' %}?status=Pending">View All</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Student</th>
+            <th>Professor</th>
+            <th>Date</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in pending_reports %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ r.student.full_name }}</div>
+                <div class="text-muted small">{{ r.student.student_id }}</div>
+              </td>
+              <td>{{ r.professor.get_full_name|default:r.professor.username }}</td>
+              <td>{{ r.date_submitted|date:"M d, Y" }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="{% url 'reports:detail' r.pk %}">Open</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">No pending reports.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  
+ 
+  <div class="row g-3 mt-3">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h2 class="h6 mb-0">High Risk Students</h2>
+            <a class="btn btn-sm btn-outline-secondary" href="#">View All</a>
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for s in high_risk_students %}
+              <li class="list-group-item">
+                <div class="fw-semibold">{{ s.full_name }}</div>
+                <div class="text-muted small">{{ s.student_id }} — {{ s.academic_record.risk_level }}</div>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">No high-risk students found.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h2 class="h6 mb-0">Recent Interventions</h2>
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'reports:cases' %}">View Cases</a>
+          </div>
+          <div class="list-group list-group-flush">
+            {% for i in recent_interventions %}
+              <div class="list-group-item">
+                <div class="fw-semibold">{{ i.report.student.full_name }}</div>
+                <div class="text-muted small">By {{ i.counselor.get_full_name|default:i.counselor.username }} — {{ i.created_at|date:"M d, Y" }}</div>
+                <div class="mt-1">{{ i.action_taken|truncatechars:120 }}</div>
+              </div>
+            {% empty %}
+              <div class="list-group-item text-muted">No interventions yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-3">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h2 class="h6 mb-0">Recent Reports</h2>
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'reports:cases' %}">View All</a>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Student</th>
+                  <th>Professor</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in recent_reports %}
+                  <tr>
+                    <td>
+                      <div class="fw-semibold">{{ r.student.full_name }}</div>
+                      <div class="text-muted small">{{ r.student.student_id }}</div>
+                    </td>
+                    <td>{{ r.professor.get_full_name|default:r.professor.username }}</td>
+                    <td>{{ r.date_submitted|date:"M d, Y" }}</td>
+                    <td>{{ r.status }}</td>
+                    <td class="text-end">
+                      <a class="btn btn-sm btn-outline-primary" href="{% url 'reports:detail' r.pk %}">Open</a>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="5" class="text-center text-muted py-4">No reports found.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

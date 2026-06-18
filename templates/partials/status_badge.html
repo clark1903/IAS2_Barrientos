@@ -1,0 +1,8 @@
+{% if status == "Pending" %}
+  <span class="badge text-bg-secondary">Pending</span>
+{% elif status == "Ongoing" %}
+  <span class="badge text-bg-warning">Ongoing</span>
+{% else %}
+  <span class="badge text-bg-success">Resolved</span>
+{% endif %}
+

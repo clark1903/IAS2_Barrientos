@@ -1,0 +1,40 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="brand">
+      <div class="brand-mark">IE</div>
+      <div>
+        <div class="brand-name">InsightEdge</div>
+        <div class="brand-sub">Risk Reporting</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    {% if user.is_authenticated %}
+      <a class="nav-link" href="{% url 'accounts:post_login' %}">
+        <span>Dashboard</span>
+      </a>
+
+      {% if current_role == "Admin" or user.is_staff %}
+        <div class="nav-section">Admin</div>
+        <a class="nav-link" href="{% url 'dashboard:admin' %}">Admin Dashboard</a>
+        <a class="nav-link" href="{% url 'students:list' %}">Students</a>
+        <a class="nav-link" href="{% url 'reports:cases' %}">Cases</a>
+        <a class="nav-link" href="{% url 'admin:index' %}">Django Admin</a>
+      {% elif current_role == "Professor" %}
+        <div class="nav-section">Professor</div>
+        <a class="nav-link" href="{% url 'dashboard:professor' %}">Professor Dashboard</a>
+        <a class="nav-link" href="{% url 'students:list' %}">Students</a>
+        <a class="nav-link" href="{% url 'reports:mine' %}">My Reports</a>
+      {% elif current_role == "Counselor" %}
+        <div class="nav-section">Counselor</div>
+        <a class="nav-link" href="{% url 'dashboard:counselor' %}">Counselor Dashboard</a>
+        <a class="nav-link" href="{% url 'students:list' %}">Students</a>
+        <a class="nav-link" href="{% url 'reports:cases' %}">Cases</a>
+      {% endif %}
+    {% else %}
+      <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+    {% endif %}
+  </nav>
+</aside>
+

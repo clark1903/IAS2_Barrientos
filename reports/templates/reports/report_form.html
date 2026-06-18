@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Submit Report | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+  <div class="card-body p-4">
+    <h1 class="h5 mb-1">Submit Report</h1>
+    <div class="text-muted mb-4">
+      Student: <strong>{{ student.full_name }}</strong> ({{ student.student_id }})
+    </div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Concern</label>
+        {{ form.concern }}
+        {% if form.concern.errors %}<div class="text-danger small">{{ form.concern.errors }}</div>{% endif %}
+      </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Submit</button>
+        <a class="btn btn-outline-secondary" href="{% url 'students:detail' student.pk %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

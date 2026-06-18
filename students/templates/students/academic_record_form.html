@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Academic Record | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+  <div class="card-body p-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h1 class="h5 mb-0">Academic Record</h1>
+      <div class="text-muted small">{{ student.full_name }} ({{ student.student_id }})</div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Grade</label>
+          {{ form.grade }}
+          {% if form.grade.errors %}<div class="text-danger small">{{ form.grade.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Attendance (%)</label>
+          {{ form.attendance }}
+          {% if form.attendance.errors %}<div class="text-danger small">{{ form.attendance.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6 mt-3">
+          <label class="form-label">Behavioral Incidents</label>
+          {{ form.behavioral_incidents }}
+          {% if form.behavioral_incidents.errors %}<div class="text-danger small">{{ form.behavioral_incidents.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6 mt-3">
+          <label class="form-label">Participation</label>
+          {{ form.participation }}
+          {% if form.participation.errors %}<div class="text-danger small">{{ form.participation.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-4 mb-0">
+        Risk score and risk level are auto-calculated when you save.
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-outline-secondary" href="{% url 'students:detail' student.pk %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

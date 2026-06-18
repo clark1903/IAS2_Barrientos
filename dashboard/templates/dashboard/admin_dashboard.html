@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-0">Admin Dashboard</h1>
+    <div class="text-muted small">Overview of student risk distribution.</div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="text-muted small">Total Students</div>
+        <div class="fs-3 fw-semibold">{{ total_students }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="text-muted small">High Risk</div>
+        <div class="fs-3 fw-semibold text-danger">{{ total_high }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="text-muted small">Moderate Risk</div>
+        <div class="fs-3 fw-semibold text-warning">{{ total_moderate }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="text-muted small">Safe</div>
+        <div class="fs-3 fw-semibold text-success">{{ total_safe }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-3">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h2 class="h6 mb-0">Risk Distribution</h2>
+      <a class="btn btn-sm btn-outline-primary" href="{% url 'admin:auth_user_add' %}">Create Account</a>
+    </div>
+    <canvas id="riskBarChart" height="90"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const ctx = document.getElementById('riskBarChart');
+  const labels = {{ chart_labels|safe }};
+  const values = {{ chart_values|safe }};
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Students',
+        data: values,
+        backgroundColor: ['#dc3545', '#fd7e14', '#198754'],
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { 
+          beginAtZero: true, 
+          ticks: { precision: 0, color: 'rgba(255, 255, 255, 0.7)' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        x: {
+          ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}
+

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Report | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-start justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-1">Report</h1>
+    <div class="text-muted">
+      Student: <strong>{{ report.student.full_name }}</strong> ({{ report.student.student_id }}) ·
+      Professor: <strong>{{ report.professor.get_full_name|default:report.professor.username }}</strong> ·
+      Submitted: {{ report.date_submitted|date:"M d, Y" }}
+    </div>
+  </div>
+  <div class="text-end">
+    <a class="btn btn-sm btn-outline-primary mb-2" href="{% url 'reports:pdf' report.pk %}">Download PDF</a>
+    <div>
+    {% include "partials/status_badge.html" with status=report.status %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h2 class="h6 mb-2">Concern</h2>
+        <div class="text-muted" style="white-space: pre-wrap;">{{ report.concern }}</div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-3">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h2 class="h6 mb-0">Interventions</h2>
+        </div>
+        {% if report.interventions.all %}
+          <div class="list-group list-group-flush">
+            {% for i in report.interventions.all %}
+              <div class="list-group-item px-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="fw-semibold">{{ i.counselor.get_full_name|default:i.counselor.username }}</div>
+                  <div class="text-muted small">{{ i.created_at|date:"M d, Y H:i" }}</div>
+                </div>
+                <div class="mt-1 text-muted" style="white-space: pre-wrap;">{{ i.action_taken }}</div>
+                <div class="mt-2 d-flex gap-2 align-items-center">
+                  {% include "partials/status_badge.html" with status=i.status_update %}
+                  {% if i.follow_up_date %}
+                    <span class="text-muted small">Follow-up: {{ i.follow_up_date|date:"M d, Y" }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-muted">No interventions recorded yet.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Internal Discussion Chat Block -->
+    <div class="card shadow-sm border-0 mt-3">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Internal Discussion</h2>
+        
+        <!-- Chat History -->
+        <div class="mb-3" style="max-height: 300px; overflow-y: auto;">
+          {% if report.comments.all %}
+            {% for comment in report.comments.all %}
+              <div class="mb-3 p-2 rounded {% if comment.author == request.user %}bg-primary-subtle border border-primary-subtle text-end ms-auto{% else %}bg-light border text-start me-auto{% endif %}" style="max-width: 85%;">
+                <div class="d-flex justify-content-between align-items-center mb-1 {% if comment.author == request.user %}flex-row-reverse{% endif %}">
+                  <span class="fw-bold small text-body-secondary">{{ comment.author.profile.role }} | {{ comment.author.get_full_name|default:comment.author.username }}</span>
+                  <span class="text-body-tertiary" style="font-size: 0.75rem;">{{ comment.created_at|date:"M d, H:i" }}</span>
+                </div>
+                <div class="text-dark" style="white-space: pre-wrap; font-size: 0.9rem;">{{ comment.message }}</div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-muted small">No comments yet. Start the discussion below.</div>
+          {% endif %}
+        </div>
+
+        <!-- Chat Input -->
+        <form method="post" action="{% url 'reports:add_case_comment' report.pk %}">
+          {% csrf_token %}
+          <div class="input-group">
+            {{ comment_form.message }}
+            <button class="btn btn-primary" type="submit">Send</button>
+          </div>
+        </form>
+        
+      </div>
+    </div>
+    <!-- End Chat Block -->
+
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h2 class="h6 mb-2">Student Risk</h2>
+        {% if report.student.academic_record %}
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              {% include "partials/risk_badge.html" with risk_level=report.student.academic_record.risk_level %}
+              <span class="text-muted small ms-2">Score: {{ report.student.academic_record.risk_score }}</span>
+            </div>
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'students:detail' report.student.pk %}">Open Student</a>
+          </div>
+        {% else %}
+          <div class="text-muted">No academic record yet.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if can_counsel %}
+      <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Update Case</h2>
+          <form method="post" action="{% url 'reports:add_intervention' report.pk %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">Action Taken / Notes</label>
+              {{ intervention_form.action_taken }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Follow-up Date</label>
+              {{ intervention_form.follow_up_date }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Status Update</label>
+              {{ intervention_form.status_update }}
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Add Intervention</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Quick Status Change</h2>
+          <form method="post" action="{% url 'reports:status' report.pk %}">
+            {% csrf_token %}
+            {{ status_form.status }}
+            <button class="btn btn-outline-primary w-100 mt-2" type="submit">Update Status</button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+

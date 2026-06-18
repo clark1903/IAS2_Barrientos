@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load security_filters %}
+{% block title %}Student Reports | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-start justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-0">Student Reports</h1>
+    <div class="text-muted small">{{ student.full_name }} ({{ student.student_id|mask_student_id }})</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'students:detail' student.pk %}">Back to Student</a>
+    {% if current_role == "Professor" or current_role == "Admin" or request.user.is_staff %}
+      <a class="btn btn-primary" href="{% url 'reports:add' student.pk %}">Submit Report</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Status</th>
+          <th>Professor</th>
+          <th>Date</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reports %}
+          <tr>
+            <td>{% include "partials/status_badge.html" with status=r.status %}</td>
+            <td>{{ r.professor.get_full_name|default:r.professor.username }}</td>
+            <td>{{ r.date_submitted|date:"M d, Y" }}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary" href="{% url 'reports:detail' r.pk %}">View</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">No reports found for this student.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "partials/pagination.html" %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load security_filters %}
+{% block title %}Professor Dashboard | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-0">Professor Dashboard</h1>
+    <div class="text-muted small">Quick overview of reports and high-risk students.</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-primary" href="{% url 'students:list' %}">Quick Add Report</a>
+    <a class="btn btn-outline-secondary" href="{% url 'reports:mine' %}">My Reports</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Recently Submitted Reports</h2>
+        <div class="list-group list-group-flush">
+          {% for r in my_reports %}
+            <a class="list-group-item list-group-item-action px-0" href="{% url 'reports:detail' r.pk %}">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="fw-semibold">{{ r.student.full_name }}</div>
+                {% include "partials/status_badge.html" with status=r.status %}
+              </div>
+              <div class="text-muted small">{{ r.date_submitted|date:"M d, Y" }}</div>
+            </a>
+          {% empty %}
+            <div class="text-muted">No reports yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-body">
+        <h2 class="h6 mb-3">High Risk Students</h2>
+        <div class="list-group list-group-flush">
+          {% for s in high_risk_students %}
+            <a class="list-group-item list-group-item-action px-0" href="{% url 'students:detail' s.pk %}">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="fw-semibold">{{ s.full_name }}</div>
+                {% include "partials/risk_badge.html" with risk_level=s.academic_record.risk_level %}
+              </div>
+              <div class="text-muted small">{{ s.student_id|mask_student_id }} · {{ s.course }}</div>
+            </a>
+          {% empty %}
+            <div class="text-muted">No high risk students yet (or no academic records saved).</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mt-3">
+  <div class="card-body">
+    <h2 class="h6 mb-3">Students You Reported</h2>
+    <div class="row g-2">
+      {% for s in students_reported %}
+        <div class="col-md-3">
+          <a class="card card-hover border-0 shadow-sm text-decoration-none" href="{% url 'students:detail' s.pk %}">
+            <div class="card-body">
+              <div class="fw-semibold text-dark">{{ s.full_name }}</div>
+              <div class="text-muted small">{{ s.student_id|mask_student_id }}</div>
+            </div>
+          </a>
+        </div>
+      {% empty %}
+        <div class="text-muted">No students reported yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

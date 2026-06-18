@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Student Form | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+  <div class="card-body p-4">
+    <h1 class="h5 mb-3">{% if object %}Edit Student{% else %}Add Student{% endif %}</h1>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Student ID</label>
+          {{ form.student_id }}
+          {% if form.student_id.errors %}<div class="text-danger small">{{ form.student_id.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">First Name</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Last Name</label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Course</label>
+          {{ form.course }}
+          {% if form.course.errors %}<div class="text-danger small">{{ form.course.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Year Level</label>
+          {{ form.year_level }}
+          {% if form.year_level.errors %}<div class="text-danger small">{{ form.year_level.errors }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-outline-secondary" href="{% url 'students:list' %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

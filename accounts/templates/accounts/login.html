@@ -1,0 +1,39 @@
+{% extends "base_auth.html" %}
+{% block title %}Login | InsightEdge{% endblock %}
+
+{% block auth_content %}
+<div class="text-center mb-4">
+  <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-circle mb-3" style="width: 64px; height: 64px; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);">
+    <h2 class="h3 m-0 text-white fw-bold">IE</h2>
+  </div>
+  <h1 class="h3 fw-bold mb-1">Welcome to InsightEdge</h1>
+  <p class="text-muted">Sign in to continue to your dashboard</p>
+</div>
+
+{% if form.errors %}
+  <div class="alert alert-danger bg-danger text-white border-0 opacity-75">
+    Please check your @tip.edu.ph email and password.
+  </div>
+{% endif %}
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label fw-medium" for="{{ form.username.id_for_label }}">Email Address</label>
+    {{ form.username }}
+  </div>
+  <div class="mb-4">
+    <label class="form-label fw-medium" for="{{ form.password.id_for_label }}">Password</label>
+    {{ form.password }}
+  </div>
+  
+  <div class="d-grid gap-3">
+    <button class="btn btn-primary btn-lg fw-semibold" type="submit">Login</button>
+  </div>
+</form>
+
+<div class="mt-4 text-center text-muted small opacity-75">
+  Accounts are created by authorized administrators only.
+</div>
+{% endblock %}
+

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Delete Student | InsightEdge{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+  <div class="card-body p-4">
+    <h1 class="h5 mb-2 text-danger">Delete Student</h1>
+    <p class="mb-4">Are you sure you want to delete <strong>{{ object.full_name }}</strong> ({{ object.student_id }})?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Yes, Delete</button>
+      <a class="btn btn-outline-secondary ms-2" href="{% url 'students:detail' object.pk %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

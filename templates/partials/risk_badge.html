@@ -1,0 +1,8 @@
+{% if risk_level == "High Risk" %}
+  <span class="badge text-bg-danger">High Risk</span>
+{% elif risk_level == "Moderate Risk" %}
+  <span class="badge text-bg-warning">Moderate Risk</span>
+{% else %}
+  <span class="badge text-bg-success">Safe</span>
+{% endif %}
+
